@@ -37,11 +37,47 @@ table {
   justify-content: center;
 }
 
-.mat-row:hover {
+tr.element-row:not(.expanded-row):hover {
   cursor: pointer;
   background-color: rgba($color: #808080, $alpha: 0.3);
 }
 
-.mat-row:active {
+tr.element-row:not(.expanded-row):active {
   background-color: rgba($color: #808080, $alpha: 0.8);
+}
+
+tr.detail-row {
+  height: 0;
+}
+
+.element-row td {
+  border-bottom-width: 0;
+}
+
+.element-detail {
+  overflow: hidden;
+  display: flex;
+}
+
+.details-wrapper {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: 15px;
+  padding: 10px 0px;
+}
+
+.detail {
+  display: flex;
+  flex-flow: column;
+  justify-items: center;
+
+  &:not(:first-child) {
+    padding-left: 15px;
+    border-left: 1px solid grey;
+  }
+
+  span:first-child {
+    font-weight: 500;
+  }
 }

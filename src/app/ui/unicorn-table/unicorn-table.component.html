@@ -9,11 +9,14 @@
       [dataSource]="dataSource"
       class="table"
       mat-table
+      multiTemplateDataRows
     >
       <!-- Number Column -->
       <ng-container matColumnDef="number">
         <th *matHeaderCellDef mat-header-cell>#</th>
-        <td *matCellDef="let row; let i = index" mat-cell>{{ paginator.pageIndex * paginator.pageSize + i + 1 }}</td>
+        <td *matCellDef="let row; let i = dataIndex" mat-cell>
+          {{ paginator.pageIndex * paginator.pageSize + i + 1 }}
+        </td>
       </ng-container>
 
       <!-- Resource Type Column -->
@@ -42,8 +45,46 @@
         <td *matCellDef="let row" mat-cell>{{ row.birthDate ? (row.birthDate | date) : 'Unknown' }}</td>
       </ng-container>
 
+      <!-- Expanded Detail Column -->
+      <ng-container matColumnDef="expandedDetail">
+        <td mat-cell *matCellDef="let row" [attr.colspan]="columns.size">
+          <div class="element-detail" [@detailExpand]="row?.id === expandedElement?.id? 'expanded' : 'collapsed'">
+            <div class="details-wrapper" *ngIf="row.resourceType === 'Patient'">
+              <div class="detail"><span>Resource Typ</span> <span>{{expandedElement?.resourceType}}</span></div>
+              <div class="detail">
+                <span>Name</span>
+                <span>{{expandedElement?.name}}</span>
+              </div>
+              <div class="detail"><span>ID</span> <span>{{expandedElement?.id}}</span></div>
+              <div class="detail"><span>Birthday</span> <span>{{expandedElement?.birthDate}}</span></div>
+              <div class="detail">
+                <span>Gender</span>
+                <span>{{expandedElement?.gender}}</span>
+              </div>
+              <div class="detail"><span>Address</span> <span>{{expandedElement?.address}}</span></div>
+            </div>
+            <div class="details-wrapper" *ngIf="row.resourceType === 'Practitioner'">
+              <div class="detail"><span>Resource Typ</span> <span>{{expandedElement?.resourceType}}</span></div>
+              <div class="detail">
+                <span>Name</span>
+                <span>{{expandedElement?.name}}</span>
+              </div>
+              <div class="detail"><span>ID</span> <span>{{expandedElement?.id}}</span></div>
+              <div class="detail"><span>Telecom</span> <span>{{expandedElement?.telecom}}</span></div>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
       <tr *matHeaderRowDef="columns" mat-header-row></tr>
-      <tr *matRowDef="let row; columns: columns" class="ripple" mat-row></tr>
+      <tr
+        *matRowDef="let row; columns: columns"
+        class="ripple element-row"
+        mat-row
+        (click)="expandElement(row)"
+        [class.expanded-row]="expandedElement?.name === row.name"
+      ></tr>
+      <tr mat-row *matRowDef="let element; columns: ['expandedDetail']" class="detail-row"></tr>
     </table>
   </div>
   <mat-paginator [length]="totalLength" [pageSizeOptions]="[10, 25, 100]" showFirstLastButtons></mat-paginator>
