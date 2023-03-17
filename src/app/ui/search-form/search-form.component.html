@@ -1,1 +1,16 @@
-<!-- implement search form here -->
+<form [formGroup]="searchForm">
+  <mat-form-field class="search-input">
+    <mat-label>Suche</mat-label>
+    <input matInput formControlName="searchInput" />
+    <mat-error *ngIf="searchForm.controls['searchInput'].errors?.['pattern']">
+      Der eingegebene Suchwert ist ungültig. Bitte verwenden Sie nur Buchstaben und Zahlen ohne Leerzeichen.
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field class="select-input">
+    <mat-label>Filter</mat-label>
+    <mat-select formControlName="selectInput">
+      <mat-option *ngFor="let option of selectOptions" [value]="option.value"> {{ option.key }} </mat-option>
+    </mat-select>
+  </mat-form-field>
+</form>

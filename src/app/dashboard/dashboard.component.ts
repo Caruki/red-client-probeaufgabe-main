@@ -1,8 +1,14 @@
 import { Component } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { catchError, map, shareReplay, startWith, tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { catchError, map, shareReplay, startWith, switchMap, tap } from 'rxjs/operators';
 import { SiteTitleService } from '@red-probeaufgabe/core';
-import { FhirSearchFn, IFhirPatient, IFhirPractitioner, IFhirSearchResponse } from '@red-probeaufgabe/types';
+import {
+  FhirSearchFn,
+  IFhirPatient,
+  IFhirPractitioner,
+  IFhirSearchResponse,
+  ISearchFormData,
+} from '@red-probeaufgabe/types';
 import { IUnicornTableColumn } from '@red-probeaufgabe/ui';
 import { SearchFacadeService } from '@red-probeaufgabe/search';
 
@@ -22,18 +28,33 @@ export class DashboardComponent {
   ]);
   isLoading = true;
 
+  searchFormData$ = new BehaviorSubject<ISearchFormData>({ searchText: '', searchFuncSelect: FhirSearchFn.SearchAll });
+
+  fhirSearchOptions = Object.values(FhirSearchFn).map((fhirSearchValue) => {
+    switch (fhirSearchValue) {
+      case 'searchAll':
+        return { value: fhirSearchValue, key: 'Patients + Practitioners' };
+      case 'searchPatients':
+        return { value: fhirSearchValue, key: 'Patients' };
+      case 'searchPractitioners':
+        return { value: fhirSearchValue, key: 'Practitioners' };
+    }
+  });
+
   /*
    * Implement search on keyword or fhirSearchFn change
    **/
-  search$: Observable<IFhirSearchResponse<IFhirPatient | IFhirPractitioner>> = this.searchFacade
-    .search(FhirSearchFn.SearchAll, '')
-    .pipe(
-      catchError(this.handleError),
-      tap(() => {
-        this.isLoading = false;
-      }),
-      shareReplay(),
-    );
+  search$: Observable<IFhirSearchResponse<IFhirPatient | IFhirPractitioner>> = this.searchFormData$.pipe(
+    switchMap((data) => {
+      return this.searchFacade.search(data.searchFuncSelect, data.searchText).pipe(
+        catchError(this.handleError),
+        tap(() => {
+          this.isLoading = false;
+        }),
+        shareReplay(),
+      );
+    }),
+  );
 
   entries$: Observable<Array<IFhirPatient | IFhirPractitioner>> = this.search$.pipe(
     map((data) => !!data && data.entry),
