@@ -4,7 +4,7 @@ import { catchError, map, shareReplay, startWith, tap } from 'rxjs/operators';
 import { SiteTitleService } from '@red-probeaufgabe/core';
 import { FhirSearchFn, IFhirPatient, IFhirPractitioner, IFhirSearchResponse } from '@red-probeaufgabe/types';
 import { IUnicornTableColumn } from '@red-probeaufgabe/ui';
-import { AbstractSearchFacadeService } from '@red-probeaufgabe/search';
+import { SearchFacadeService } from '@red-probeaufgabe/search';
 
 @Component({
   selector: 'app-dashboard',
@@ -45,7 +45,10 @@ export class DashboardComponent {
     startWith(0),
   );
 
-  constructor(private siteTitleService: SiteTitleService, private searchFacade: AbstractSearchFacadeService) {
+  // Fehler: Der Abstract Service wurde importiert statt des richtigen implementierten Search Facade Services, des weiteren musste der Service im dashboard.module.ts im providers Array hinzugefügt werden.
+  // Abstrakte Klassen/Services sind Blaupausen für davon abgeleitete Klassen/Services und können daher nicht im Code produktiv verwendet werden. Des weiteren muss ein Service immer als provider im zugehörigen oder App-Modul registriert werden.
+
+  constructor(private siteTitleService: SiteTitleService, private searchFacade: SearchFacadeService) {
     this.siteTitleService.setSiteTitle('Dashboard');
   }
 
